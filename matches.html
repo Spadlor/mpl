@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="All previous match results for the KAC / MPL league.">
+    <title>MPL · All Previous Matches</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="./index.html">
+                        <img src="https://cdn.jsdelivr.net/gh/spadlor/mpl@main/logo.svg" alt="Logo">
+                        <span>MPL</span>
+                    </a>
+                </div>
+                <nav class="nav">
+                    <ul class="nav-menu">
+                        <li class="nav-item"><a href="./matches.html" class="nav-link active">Matches</a></li>
+                        <li class="nav-item"><a href="./scores.html" class="nav-link">Scores</a></li>
+                        <li class="nav-item"><a href="./cards.html" class="nav-link">Cards</a></li>
+                    </ul>
+                    <div class="hamburger" id="hamburger">
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-wrap">
+
+        <!-- ===== ALL PREVIOUS MATCHES ===== -->
+        <section class="score-section" id="previous-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>All Previous Matches</h2>
+                    <p>Every completed match, newest first</p>
+                </div>
+                <div id="previous-container" class="score-grid two-col">
+                    <div class="loading"><div class="spinner"></div>Loading previous matches…</div>
+                </div>
+                <div style="text-align:center; margin-top:2rem;">
+                    <a href="./scores.html" class="btn btn-secondary">← Back to Scores</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img src="https://cdn.jsdelivr.net/gh/spadlor/mpl@main/logo.svg" alt="Logo">
+                        <span>MPL</span>
+                    </div>
+                    <p>Live scores, fixtures and standings — all in one place.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="./matches.html">Matches</a></li>
+                        <li><a href="./scores.html">Scores</a></li>
+                        <li><a href="./cards.html">Cards</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Whatsapp: +918593848438</p>
+                    <p>Kerala, India</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Made with ❤️ by <a href="https://linkedin.com/shxmeem" target="_blank" rel="noopener">Dev</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    /* =========================================================
+       Minimal YAML parser (handles the structure of scores.yml)
+       ========================================================= */
+    function parseYaml(text) {
+        const lines = text.replace(/\r\n/g, '\n').split('\n');
+        const root = {};
+        const stack = [{ indent: -1, value: root }];
+
+        function getContainer(parent, key, isList) {
+            if (isList) {
+                if (!Array.isArray(parent[key])) parent[key] = [];
+                return parent[key];
+            } else {
+                if (typeof parent[key] !== 'object' || parent[key] === null || Array.isArray(parent[key])) {
+                    parent[key] = {};
+                }
+                return parent[key];
+            }
+        }
+
+        for (let i = 0; i < lines.length; i++) {
+            let raw = lines[i];
+            if (!raw.trim()) continue;
+            if (/^\s*#/.test(raw)) continue;
+
+            const indent = raw.match(/^\s*/)[0].length;
+            let line = raw.trim();
+
+            while (stack.length > 1 && stack[stack.length - 1].indent >= indent) {
+                stack.pop();
+            }
+            const parent = stack[stack.length - 1].value;
+
+            if (line.startsWith('- ')) {
+                const itemText = line.slice(2).trim();
+                if (!Array.isArray(parent)) continue;
+                const item = {};
+                parent.push(item);
+                stack.push({ indent: indent + 2, value: item });
+
+                const m = itemText.match(/^([^:]+):\s*(.*)$/);
+                if (m) {
+                    const key = m[1].trim();
+                    const val = m[2].trim();
+                    if (val === '') {
+                        const next = lines[i + 1];
+                        let nextIndent = -1, nextText = '';
+                        if (next !== undefined) {
+                            nextIndent = next.match(/^\s*/)[0].length;
+                            nextText = next.trim();
+                        }
+                        if (nextText.startsWith('- ') && nextIndent > indent) {
+                            item[key] = [];
+                            stack.push({ indent: nextIndent, value: item[key] });
+                        } else {
+                            item[key] = {};
+                            stack.push({ indent: indent + 2, value: item[key] });
+                        }
+                    } else {
+                        item[key] = parseScalar(val);
+                    }
+                }
+                continue;
+            }
+
+            const m = line.match(/^([^:]+):\s*(.*)$/);
+            if (!m) continue;
+            const key = m[1].trim();
+            const val = m[2].trim();
+
+            if (val === '') {
+                let j = i + 1;
+                while (j < lines.length && (!lines[j].trim() || /^\s*#/.test(lines[j]))) j++;
+                let isList = false;
+                if (j < lines.length) {
+                    const nextIndent = lines[j].match(/^\s*/)[0].length;
+                    if (nextIndent > indent && lines[j].trim().startsWith('- ')) isList = true;
+                }
+                if (isList) {
+                    if (!Array.isArray(parent[key])) parent[key] = [];
+                    stack.push({ indent: indent, value: parent[key] });
+                } else {
+                    if (typeof parent[key] !== 'object' || parent[key] === null || Array.isArray(parent[key])) parent[key] = {};
+                    stack.push({ indent: indent, value: parent[key] });
+                }
+            } else {
+                parent[key] = parseScalar(val);
+            }
+        }
+        return root;
+    }
+
+    function parseScalar(v) {
+        if (v === '') return '';
+        if (v === '""' || v === "''") return '';
+        if (v === 'null' || v === '~') return null;
+        if (v === 'true') return true;
+        if (v === 'false') return false;
+        if (/^-?\d+$/.test(v)) return parseInt(v, 10);
+        if (/^-?\d*\.\d+$/.test(v)) return parseFloat(v);
+        if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+            return v.slice(1, -1);
+        }
+        const ci = v.indexOf(' #');
+        if (ci > -1) return v.slice(0, ci).trim();
+        return v;
+    }
+
+    /* =========================================================
+       RENDERING
+       ========================================================= */
+    const SCORES_URL = 'https://cdn.jsdelivr.net/gh/spadlor/mpl@main/scores.yml';
+
+    function esc(s) {
+        return String(s ?? '')
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function normaliseMatch(m) {
+        if (!m) return null;
+        const t1 = m.team_1 || m.team1 || {};
+        const t2 = m.team_2 || m.team2 || {};
+        const cards = m.cards || {};
+        return {
+            team1: { name: t1.name ?? 'Team 1', score: t1.score },
+            team2: { name: t2.name ?? 'Team 2', score: t2.score },
+            cards: {
+                yellow: Array.isArray(cards.yellow) ? cards.yellow.map(x => typeof x === 'string' ? x : (x && x.name) || '') : [],
+                red: Array.isArray(cards.red) ? cards.red.map(x => typeof x === 'string' ? x : (x && x.name) || '') : []
+            }
+        };
+    }
+
+    function scoreText(score) {
+        if (score === '' || score === null || score === undefined) return '—';
+        return esc(score);
+    }
+
+    function renderMatchCard(match) {
+        const m = normaliseMatch(match);
+        if (!m) return '';
+
+        const score1 = scoreText(m.team1.score);
+        const score2 = scoreText(m.team2.score);
+        const emptyClass1 = (m.team1.score === '' || m.team1.score === null || m.team1.score === undefined) ? 'empty' : '';
+        const emptyClass2 = (m.team2.score === '' || m.team2.score === null || m.team2.score === undefined) ? 'empty' : '';
+
+        const yellow = m.cards.yellow.filter(Boolean);
+        const red = m.cards.red.filter(Boolean);
+
+        let cardsHtml = '';
+        if (yellow.length || red.length) {
+            cardsHtml = `<div class="cards-row">
+                ${yellow.length ? `<span class="card-pill"><span class="dot yellow"></span>Yellow: ${yellow.map(esc).join(', ')}</span>` : ''}
+                ${red.length ? `<span class="card-pill"><span class="dot red"></span>Red: ${red.map(esc).join(', ')}</span>` : ''}
+            </div>`;
+        }
+
+        return `
+            <div class="match-card">
+                <div class="match-teams">
+                    <div class="team">
+                        <div class="team-name">${esc(m.team1.name)}</div>
+                        <div class="team-score ${emptyClass1}">${score1}</div>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="team">
+                        <div class="team-name">${esc(m.team2.name)}</div>
+                        <div class="team-score ${emptyClass2}">${score2}</div>
+                    </div>
+                </div>
+                ${cardsHtml}
+                <div class="match-meta">
+                    <span>✅ Finished</span>
+                    <span>Match result</span>
+                </div>
+            </div>`;
+    }
+
+    function renderAllPrevious(matches) {
+        const el = document.getElementById('previous-container');
+        if (!el) return;
+
+        let list = matches;
+        if (!list) list = [];
+        if (!Array.isArray(list)) list = [list];
+
+        // Reverse so newest (top of yml) appears... wait — user asked "bottom to top"
+        // meaning newest at top? Let's interpret: show all previous matches,
+        // ordered from bottom to top of the source → i.e. reverse the original order
+        // so the last item in the yml (oldest) is shown first, newest last.
+        // However "bottom to top" commonly means newest first. We'll reverse
+        // the array so the last previous match in the YAML appears at the top.
+        list = list.slice().reverse();
+
+        if (!list.length) {
+            el.innerHTML = `<div class="empty-state">No previous matches available.</div>`;
+            return;
+        }
+        el.innerHTML = list.map(m => renderMatchCard(m)).join('');
+    }
+
+    /* =========================================================
+       BOOT
+       ========================================================= */
+    async function loadMatches() {
+        try {
+            const res = await fetch(SCORES_URL, { cache: 'no-store' });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const text = await res.text();
+            const data = parseYaml(text);
+
+            const previous = data.previous || [];
+            renderAllPrevious(previous);
+
+        } catch (err) {
+            console.error('Failed to load matches:', err);
+            const el = document.getElementById('previous-container');
+            if (el) el.innerHTML = `<div class="empty-state">Could not load match data. Please try again later.</div>`;
+        }
+    }
+
+    /* =========================================================
+       NAV / UI
+       ========================================================= */
+    document.addEventListener('DOMContentLoaded', function () {
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navMenu.classList.toggle('active');
+                document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+            });
+        }
+
+        const header = document.querySelector('.header');
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 100);
+        });
+
+        loadMatches();
+    });
+    </script>
+</body>
+</html>
