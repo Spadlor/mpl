@@ -1,18 +1,13 @@
 import os
-import base64
 import logging
 import httpx
 from fastapi import APIRouter, HTTPException, Request, status
 
 router = APIRouter()
 
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")  # e.g. "8282828"
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-GITHUB_OWNER = "spadlor"
-GITHUB_REPO = "mpl"
-GITHUB_BRANCH = "main"
-GITHUB_FILE_PATH = "scores.yml"
-JSDELIVR_PURGE_URL = "https://purge.jsdelivr.net/"
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+BLOB_READ_WRITE_TOKEN = os.getenv("BLOB_READ_WRITE_TOKEN")
+BLOB_FILE_PATH = "scores.yml"
 
 logger = logging.getLogger("admin_scores")
 logger.setLevel(logging.INFO)
@@ -24,68 +19,23 @@ if not logger.handlers:
     logger.addHandler(handler)
 
 
-async def _get_file_sha(client: httpx.AsyncClient) -> str | None:
-    """Return the current SHA of the file, or None if it doesn't exist."""
-    url = (
-        f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}"
-        f"/contents/{GITHUB_FILE_PATH}"
-    )
-    resp = await client.get(
-        url,
-        headers={
-            "Authorization": f"Bearer {GITHUB_TOKEN}",
-            "Accept": "application/vnd.github+json",
-        },
-        params={"ref": GITHUB_BRANCH},
-    )
-    if resp.status_code == 404:
-        return None
-    resp.raise_for_status()
-    return resp.json().get("sha")
-
-
-async def _put_file(
-    client: httpx.AsyncClient,
-    content: str,
-    existing_sha: str | None,
-) -> None:
-    """Create (sha=None) or update (sha=<existing>) the file in one PUT."""
-    url = (
-        f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}"
-        f"/contents/{GITHUB_FILE_PATH}"
-    )
-    encoded = base64.b64encode(content.encode("utf-8")).decode("utf-8")
-    payload = {
-        "message": "chore: update scores.yml",
-        "content": encoded,
-        "branch": GITHUB_BRANCH,
-    }
-    if existing_sha:
-        payload["sha"] = existing_sha
-
+async def _put_vercel_blob(client: httpx.AsyncClient, content: str) -> dict:
+    """Upload or override the scores.yml file directly in Vercel Blob."""
+    # Vercel Blob Server Upload API endpoint
+    url = f"https://blob.vercel-storage.com/{BLOB_FILE_PATH}"
+    
     resp = await client.put(
         url,
         headers={
-            "Authorization": f"Bearer {GITHUB_TOKEN}",
-            "Accept": "application/vnd.github+json",
+            "Authorization": f"Bearer {BLOB_READ_WRITE_TOKEN}",
+            "x-access": "public",  # Change to "private" if your store is private
+            "x-add-random-suffix": "0",  # Ensures it overwrites the exact filename without random string suffixes
+            "x-allow-overwrite": "true", # Explicitly allows overriding an existing file
         },
-        json=payload,
+        content=content.encode("utf-8"),
     )
     resp.raise_for_status()
-
-
-async def _purge_jsdelivr() -> None:
-    async with httpx.AsyncClient(timeout=15.0) as client:
-        resp = await client.post(
-            JSDELIVR_PURGE_URL,
-            headers={"content-type": "application/json"},
-            json={
-                "path": [
-                    "/gh/spadlor/mpl@main/scores.yml",
-                ]
-            },
-        )
-        resp.raise_for_status()
+    return resp.json()
 
 
 @router.post("/admin")
@@ -128,8 +78,8 @@ async def update_scores(request: Request):
             detail="Missing or empty file content",
         )
 
-    if not GITHUB_TOKEN:
-        logger.error("GITHUB_TOKEN env var not configured")
+    if not BLOB_READ_WRITE_TOKEN:
+        logger.error("BLOB_READ_WRITE_TOKEN env var not configured")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Server misconfigured",
@@ -137,33 +87,22 @@ async def update_scores(request: Request):
 
     try:
         async with httpx.AsyncClient(timeout=20.0) as client:
-            existing_sha = await _get_file_sha(client)
-            if existing_sha:
-                logger.info(
-                    "Updating existing scores.yml (sha=%s)", existing_sha[:10]
-                )
-            else:
-                logger.info("Creating new scores.yml (no existing file)")
-
-            await _put_file(client, file_content, existing_sha)
+            logger.info("Updating scores.yml in Vercel Blob...")
+            result = await _put_vercel_blob(client, file_content)
             logger.info(
-                "scores.yml %s (%d bytes)",
-                "updated" if existing_sha else "created",
+                "scores.yml successfully updated in Vercel Blob (%d bytes)",
                 len(file_content),
             )
 
-        await _purge_jsdelivr()
-        logger.info("jsdelivr purge triggered")
-
         return {
             "status": "success",
-            "message": "scores.yml updated and purge triggered",
-            "action": "updated" if existing_sha else "created",
+            "message": "scores.yml updated successfully via Vercel Blob",
+            "blob_url": result.get("url"),
         }
 
     except httpx.HTTPStatusError as e:
         logger.error(
-            "GitHub/JSdelivr error | status=%s | body=%s",
+            "Vercel Blob error | status=%s | body=%s",
             e.response.status_code,
             e.response.text[:500],
         )
