@@ -31,6 +31,8 @@ async def _put_vercel_blob(client: httpx.AsyncClient, content: str) -> dict:
             "x-access": "public",  # Change to "private" if your store is private
             "x-add-random-suffix": "0",  # Ensures it overwrites the exact filename without random string suffixes
             "x-allow-overwrite": "true", # Explicitly allows overriding an existing file
+            "x-cache-control-max-age": "0",  # Overrides cache to 0
+            "Content-Type": "text/plain",  # Sets file format to text/plain
         },
         content=content.encode("utf-8"),
     )
