@@ -33,6 +33,7 @@
             display: flex;
             gap: 0.65rem;
             align-items: center;
+            flex-wrap: wrap;
         }
         .btn-primary, .btn-ghost, .btn-danger, .btn-sm {
             border: none;
@@ -43,20 +44,20 @@
             font-family: inherit;
         }
         .btn-primary {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: #fff;
+            background: #ffffff;
+            color: #000000;
             padding: 0.65rem 1.35rem;
             font-size: 0.95rem;
-            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+            box-shadow: 0 4px 16px rgba(255, 255, 255, 0.25);
         }
-        .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.08); }
+        .btn-primary:hover { transform: translateY(-1px); filter: brightness(0.9); }
         .btn-ghost {
-            background: rgba(255, 255, 255, 0.08);
-            color: inherit;
+            background: #ffffff;
+            color: #000000;
             padding: 0.6rem 1rem;
             font-size: 0.9rem;
         }
-        .btn-ghost:hover { background: rgba(255, 255, 255, 0.14); }
+        .btn-ghost:hover { background: #e2e8f0; }
         .btn-sm {
             padding: 0.4rem 0.75rem;
             font-size: 0.82rem;
@@ -95,6 +96,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
         .badge-tag {
             font-size: 0.75rem;
@@ -650,7 +652,7 @@
                 <div class="editor-card ${isLive ? 'live-card' : ''}">
                     <div class="card-head">
                         <span class="badge-tag ${isLive ? 'live' : ''}">${tagText}</span>
-                        <div style="display:flex; gap:0.4rem;">
+                        <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
                             ${isLive ? `<button type="button" class="btn-ghost btn-sm" data-action="finish-live" data-idx="${idx}">Finish → Previous</button>` : ''}
                             ${sectionKey === 'next' ? `<button type="button" class="btn-ghost btn-sm" data-action="start-next" data-idx="${idx}">Start Live</button>` : ''}
                             <button type="button" class="btn-danger btn-sm" data-action="del-match" data-sec="${sectionKey}" data-idx="${idx}">Delete</button>
@@ -926,7 +928,7 @@
                 throw new Error(data.detail || `Error ${res.status}`);
             }
 
-            modal.classList.remove('open');
+      modal.classList.remove('open');
             showToast('scores.yml updated & cache purged!');
         } catch (err) {
             showToast(err.message || 'Update failed', false);
