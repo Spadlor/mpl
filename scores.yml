@@ -3,61 +3,23 @@ live:
       name: Bwiwje
       score: 4
     team_2:
-      name: Bwiw
-      score: 7
+      name: ""
+      score: ""
     cards:
-      yellow:
-        - name: Player A
-        - name: Player B
-      red:
-        - name: Player C
+      yellow: []
+      red: []
 
 previous:
   - team_1:
       name: Bwiwje
       score: 4
     team_2:
-      name: Bwiw
-      score: 7
-    cards:
-      yellow:
-        - name: Player A
-        - name: Player B
-      red:
-        - name: Player C
-
-next:
-  - team_1:
-      name: Bwiwje
-      score: ""
-    team_2:
-      name: Bwiw
+      name: ""
       score: ""
     cards:
       yellow: []
       red: []
 
+next: []
 
-      
-scoreboard:
-  - team_name: Team One
-    won: 2
-    played: 8
-    drawn: 8
-    lost: 7
-    in_game: true
-    points: 82
-  - team_name: Team Two
-    won: 2
-    played: 8
-    drawn: 8
-    lost: 7
-    in_game: true
-    points: 82
-  - team_name: Team Three
-    won: 2
-    played: 8
-    drawn: 8
-    lost: 7
-    in_game: true
-    points: 82
+scoreboard: []
