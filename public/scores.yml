@@ -1,7 +1,55 @@
-live: []
+live:
+  - team_1:
+      name: Bwiwje
+      score: 4
+    team_2:
+      name: ""
+      score: ""
+    cards:
+      yellow: []
+      red: []
 
-previous: []
+previous:
+  - team_1:
+      name: Bwiwje
+      score: 4
+    team_2:
+      name: ""
+      score: ""
+    cards:
+      yellow: []
+      red: []
 
-next: []
+next:
+  - team_1:
+      name: Bwiwje
+      score: ""
+    team_2:
+      name: ""
+      score: ""
+    cards:
+      yellow: []
+      red: []
 
-scoreboard: []
+scoreboard:
+  - team_name: Team One
+    won: 0
+    played: 0
+    drawn: 0
+    lost: 0
+    in_game: false
+    points: 0
+  - team_name: Team Two
+    won: 0
+    played: 0
+    drawn: 0
+    lost: 0
+    in_game: false
+    points: 0
+  - team_name: Team Three
+    won: 0
+    played: 0
+    drawn: 0
+    lost: 0
+    in_game: false
+    points: 0
