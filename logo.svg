@@ -26,9 +26,6 @@
     </filter>
   </defs>
 
-  <!-- Deep Dark Background to Make the Gradient Glow Pop -->
-  <rect width="100%" height="100%" fill="#0a0a0c" />
-
   <!-- Fluid & Expressive Script MPL Wordmark with Gradient and Glow -->
   <g fill="none" stroke="url(#neonGradient)" stroke-linecap="round" stroke-linejoin="round" filter="url(#neonGlow)">
     
