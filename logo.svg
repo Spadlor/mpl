@@ -1,6 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
-  <g fill="none" stroke="#F4F3EE" stroke-linecap="round" stroke-linejoin="round">
-    <path stroke-width="18" d="
+  <defs>
+    <!-- Vibrant Neon Gradient -->
+    <linearGradient id="neonGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF2A85" />
+      <stop offset="50%" stop-color="#9A00FF" />
+      <stop offset="100%" stop-color="#00F0FF" />
+    </linearGradient>
+
+    <!-- Strong Multi-layer Glow Filter -->
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <!-- Outer soft spread -->
+      <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur1" />
+      <feGaussianBlur in="SourceGraphic" stdDeviation="24" result="blur2" />
+      
+      <!-- Intense core glow -->
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur3" />
+      
+      <!-- Merge glows together with original graphic -->
+      <feMerge>
+        <feMergeNode in="blur2" />
+        <feMergeNode in="blur1" />
+        <feMergeNode in="blur3" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Deep Dark Background to Make the Gradient Glow Pop -->
+  <rect width="100%" height="100%" fill="#0a0a0c" />
+
+  <!-- Fluid & Expressive Script MPL Wordmark with Gradient and Glow -->
+  <g fill="none" stroke="url(#neonGradient)" stroke-linecap="round" stroke-linejoin="round" filter="url(#neonGlow)">
+    
+    <!-- Letter M with flowing entry and ligature into P -->
+    <path stroke-width="16" d="
       M 155 182
       C 150 155, 195 130, 222 142
       C 238 150, 212 215, 196 242
@@ -10,17 +43,21 @@
       C 352 162, 326 225, 336 242
       C 348 260, 392 222, 422 175
     " />
-    <path stroke-width="18" d="
+
+    <!-- Letter P with expressive descender loop and bowl -->
+    <path stroke-width="16" d="
       M 426 168
       C 406 218, 378 278, 342 292
       C 324 298, 314 286, 320 274
     " />
-    <path stroke-width="17" d="
+    <path stroke-width="15" d="
       M 388 182
       C 412 142, 478 135, 496 164
       C 512 190, 472 222, 412 222
     " />
-    <path stroke-width="18" d="
+
+    <!-- Letter L with sweeping ascender loop and tail -->
+    <path stroke-width="16" d="
       M 484 202
       C 528 202, 578 175, 588 148
       C 596 128, 576 124, 560 144
