@@ -1,3 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="300" height="100" viewBox="0 0 300 100">
-  <text x="50%" y="68" text-anchor="middle" font-family="Arial Black, Inter, sans-serif" font-size="72" font-weight="900" letter-spacing="6" fill="#111111">MPL</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+  <g fill="none" stroke="#F4F3EE" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke-width="18" d="
+      M 155 182
+      C 150 155, 195 130, 222 142
+      C 238 150, 212 215, 196 242
+      C 214 205, 255 148, 282 152
+      C 298 154, 275 212, 260 238
+      C 278 202, 315 156, 338 160
+      C 352 162, 326 225, 336 242
+      C 348 260, 392 222, 422 175
+    " />
+    <path stroke-width="18" d="
+      M 426 168
+      C 406 218, 378 278, 342 292
+      C 324 298, 314 286, 320 274
+    " />
+    <path stroke-width="17" d="
+      M 388 182
+      C 412 142, 478 135, 496 164
+      C 512 190, 472 222, 412 222
+    " />
+    <path stroke-width="18" d="
+      M 484 202
+      C 528 202, 578 175, 588 148
+      C 596 128, 576 124, 560 144
+      C 538 172, 514 235, 482 252
+      C 458 264, 444 250, 452 236
+      C 462 220, 496 228, 548 248
+      C 592 265, 632 272, 650 256
+    " />
+  </g>
 </svg>
