@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAC · Admin</title>
+    <link rel="stylesheet" href="./styles.css">
+    <style>
+        .admin-bar {
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.85rem 0;
+        }
+        .admin-bar-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .admin-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .admin-actions {
+            display: flex;
+            gap: 0.65rem;
+            align-items: center;
+        }
+        .btn-primary, .btn-ghost, .btn-danger, .btn-sm {
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            padding: 0.65rem 1.35rem;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+        }
+        .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.08); }
+        .btn-ghost {
+            background: rgba(255, 255, 255, 0.08);
+            color: inherit;
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+        }
+        .btn-ghost:hover { background: rgba(255, 255, 255, 0.14); }
+        .btn-sm {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.82rem;
+            border-radius: 8px;
+        }
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.28); }
+        .section-top {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .section-top .section-header { margin-bottom: 0; text-align: left; }
+        .section-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .editor-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 16px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .editor-card.live-card {
+            border-color: rgba(239, 68, 68, 0.45);
+            box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.15);
+        }
+        .card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        .badge-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .badge-tag.live { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .teams-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        @media (max-width: 600px) {
+            .teams-grid { grid-template-columns: 1fr; }
+            .vs-pill { text-align: center; }
+        }
+        .team-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+        .vs-pill {
+            font-weight: 800;
+            font-size: 0.85rem;
+            opacity: 0.6;
+            padding: 0 0.25rem;
+        }
+        .field-input {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 9px;
+            padding: 0.55rem 0.75rem;
+            color: inherit;
+            font-size: 0.92rem;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        .field-input:focus {
+            outline: none;
+            border-color: #818cf8;
+        }
+        .score-input {
+            font-weight: 700;
+            font-size: 1.05rem;
+            text-align: center;
+        }
+        .cards-editor {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        @media (max-width: 600px) {
+            .cards-editor { grid-template-columns: 1fr; }
+        }
+        .card-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .card-group-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 600;
+            opacity: 0.85;
+        }
+        .player-row {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+        }
+        .player-row .field-input {
+            padding: 0.38rem 0.6rem;
+            font-size: 0.85rem;
+        }
+        .sb-input {
+            width: 72px;
+            text-align: center;
+            padding: 0.4rem 0.45rem;
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: inherit;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        .sb-name-input {
+            width: 100%;
+            min-width: 140px;
+            padding: 0.4rem 0.6rem;
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: inherit;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        .toggle-btn {
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .toggle-btn.on { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .toggle-btn.off { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.78);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 1rem;
+        }
+        .modal-backdrop.open { display: flex; }
+        .modal-box {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 18px;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+        }
+        .modal-box h3 { margin: 0; font-size: 1.2rem; }
+        .modal-box p { margin: 0; font-size: 0.9rem; opacity: 0.75; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 0.6rem; }
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            padding: 0.85rem 1.2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 300;
+            transform: translateY(120%);
+            opacity: 0;
+            transition: all 0.25s ease;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.ok { background: #16a34a; color: #fff; }
+        .toast.err { background: #dc2626; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="./">
+                        <img src="https://cdn.jsdelivr.net/gh/spadlor/mpl@main/logo.svg" alt="MPL Logo">
+                        <span>MPL Admin</span>
+                    </a>
+                </div>
+                <nav class="nav">
+                    <ul class="nav-menu">
+                        <li class="nav-item"><a href="./" class="nav-link">Live</a></li>
+                        <li class="nav-item"><a href="./matches" class="nav-link">Matches</a></li>
+                        <li class="nav-item"><a href="./scores" class="nav-link">Scores</a></li>
+                        <li class="nav-item"><a href="./cards" class="nav-link">Cards</a></li>
+                    </ul>
+                    <div class="hamburger" id="hamburger">
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="admin-bar">
+        <div class="container admin-bar-inner">
+            <div class="admin-title">⚙️ Scoreboard & Match Editor</div>
+            <div class="admin-actions">
+                <button type="button" class="btn-ghost" id="reload-btn">↻ Reload</button>
+                <button type="button" class="btn-primary" id="apply-btn">Apply Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="page-wrap">
+
+        <section class="score-section" id="live-section">
+            <div class="container">
+                <div class="section-top">
+                    <div class="section-header">
+                        <h2>Live</h2>
+                        <p>Currently active matches</p>
+                    </div>
+                    <div class="section-btns">
+                        <button type="button" class="btn-ghost btn-sm" id="promote-next-btn">⬆ Promote First Upcoming to Live</button>
+                        <button type="button" class="btn-primary btn-sm" id="add-live-btn">+ Add New Live</button>
+                    </div>
+                </div>
+                <div id="live-container" class="score-grid">
+                    <div class="loading"><div class="spinner"></div>Loading data…</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="score-section alt" id="previous-section">
+            <div class="container">
+                <div class="section-top">
+                    <div class="section-header">
+                        <h2>Previous</h2>
+                        <p>Completed match history</p>
+                    </div>
+                    <div class="section-btns">
+                        <button type="button" class="btn-ghost btn-sm" id="add-previous-btn">+ Add Previous Match</button>
+                    </div>
+                </div>
+                <div id="previous-container" class="score-grid two-col"></div>
+            </div>
+        </section>
+
+        <section class="score-section" id="next-section">
+            <div class="container">
+                <div class="section-top">
+                    <div class="section-header">
+                        <h2>Upcoming</h2>
+                        <p>Scheduled fixtures</p>
+                    </div>
+                    <div class="section-btns">
+                        <button type="button" class="btn-ghost btn-sm" id="add-next-btn">+ Add Upcoming Match</button>
+                    </div>
+                </div>
+                <div id="next-container" class="score-grid two-col"></div>
+            </div>
+        </section>
+
+        <section class="score-section alt" id="scoreboard-section">
+            <div class="container">
+                <div class="section-top">
+                    <div class="section-header">
+                        <h2>Scoreboard</h2>
+                        <p>Standings & points</p>
+                    </div>
+                    <div class="section-btns">
+                        <button type="button" class="btn-ghost btn-sm" id="add-team-btn">+ Add Team</button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="scoreboard">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left;">Team</th>
+                                <th>Played</th>
+                                <th>Won</th>
+                                <th>Drawn</th>
+                                <th>Lost</th>
+                                <th>In Game</th>
+                                <th>Points</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="scoreboard-body">
+                            <tr><td colspan="8" style="text-align:center; padding:2rem;">Loading scoreboard…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div class="modal-backdrop" id="password-modal">
+        <div class="modal-box">
+            <h3>Confirm Update</h3>
+            <p>Enter the admin password to publish changes to scores.yml.</p>
+            <input type="password" id="admin-password-input" class="field-input" placeholder="Admin password" autocomplete="current-password">
+            <div class="modal-footer">
+                <button type="button" class="btn-ghost" id="cancel-modal-btn">Cancel</button>
+                <button type="button" class="btn-primary" id="submit-modal-btn">Publish</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+    const SCORES_URL = 'https://cdn.jsdelivr.net/gh/spadlor/mpl@main/scores.yml';
+    const ADMIN_ENDPOINT = '/api/admin';
+
+    let state = {
+        live: [],
+        previous: [],
+        next: [],
+        scoreboard: []
+    };
+
+    function parseYaml(text) {
+        const lines = text.replace(/\r\n/g, '\n').split('\n');
+        const root = {};
+        const stack = [{ indent: -1, value: root }];
+
+        for (let i = 0; i < lines.length; i++) {
+            let raw = lines[i];
+            if (!raw.trim() || /^\s*#/.test(raw)) continue;
+
+            const indent = raw.match(/^\s*/)[0].length;
+            let line = raw.trim();
+
+            while (stack.length > 1 && stack[stack.length - 1].indent >= indent) {
+                stack.pop();
+            }
+            const parent = stack[stack.length - 1].value;
+
+            if (line.startsWith('- ')) {
+                const itemText = line.slice(2).trim();
+                if (!Array.isArray(parent)) continue;
+                const item = {};
+                parent.push(item);
+                stack.push({ indent: indent + 2, value: item });
+
+                const m = itemText.match(/^([^:]+):\s*(.*)$/);
+                if (m) {
+                    const key = m[1].trim();
+                    const val = m[2].trim();
+                    if (val === '') {
+                        const next = lines[i + 1];
+                        let nextIndent = -1, nextText = '';
+                        if (next !== undefined) {
+                            nextIndent = next.match(/^\s*/)[0].length;
+                            nextText = next.trim();
+                        }
+                        if (nextText.startsWith('- ') && nextIndent > indent) {
+                            item[key] = [];
+                            stack.push({ indent: nextIndent, value: item[key] });
+                        } else {
+                            item[key] = {};
+                            stack.push({ indent: indent + 2, value: item[key] });
+                        }
+                    } else {
+                        item[key] = parseScalar(val);
+                    }
+                }
+                continue;
+            }
+
+            const m = line.match(/^([^:]+):\s*(.*)$/);
+            if (!m) continue;
+            const key = m[1].trim();
+            const val = m[2].trim();
+
+            if (val === '') {
+                let j = i + 1;
+                while (j < lines.length && (!lines[j].trim() || /^\s*#/.test(lines[j]))) j++;
+                let isList = false;
+                if (j < lines.length) {
+                    const nextIndent = lines[j].match(/^\s*/)[0].length;
+                    if (nextIndent > indent && lines[j].trim().startsWith('- ')) isList = true;
+                }
+                if (isList) {
+                    if (!Array.isArray(parent[key])) parent[key] = [];
+                    stack.push({ indent: indent, value: parent[key] });
+                } else {
+                    if (typeof parent[key] !== 'object' || parent[key] === null || Array.isArray(parent[key])) parent[key] = {};
+                    stack.push({ indent: indent, value: parent[key] });
+                }
+            } else {
+                parent[key] = parseScalar(val);
+            }
+        }
+        return root;
+    }
+
+    function parseScalar(v) {
+        if (v === '' || v === '""' || v === "''" || v === '[]') return v === '[]' ? [] : '';
+        if (v === 'null' || v === '~') return '';
+        if (v === 'true') return true;
+        if (v === 'false') return false;
+        if (/^-?\d+$/.test(v)) return parseInt(v, 10);
+        if (/^-?\d*\.\d+$/.test(v)) return parseFloat(v);
+        if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+            return v.slice(1, -1);
+        }
+        const ci = v.indexOf(' #');
+        if (ci > -1) return v.slice(0, ci).trim();
+        return v;
+    }
+
+    function createEmptyMatch(isNext = false) {
+        return {
+            team_1: { name: '', score: isNext ? '' : 0 },
+            team_2: { name: '', score: isNext ? '' : 0 },
+            cards: { yellow: [], red: [] }
+        };
+    }
+
+    function normalizeMatch(m) {
+        if (!m) return createEmptyMatch();
+        const t1 = m.team_1 || m.team1 || {};
+        const t2 = m.team_2 || m.team2 || {};
+        const cards = m.cards || {};
+        const normCards = (arr) => {
+            if (!Array.isArray(arr)) return [];
+            return arr.map(x => typeof x === 'string' ? x : (x && x.name ? String(x.name) : '')).filter(x => x !== undefined);
+        };
+        return {
+            team_1: {
+                name: t1.name ?? '',
+                score: t1.score === null || t1.score === undefined ? '' : t1.score
+            },
+            team_2: {
+                name: t2.name ?? '',
+                score: t2.score === null || t2.score === undefined ? '' : t2.score
+            },
+            cards: {
+                yellow: normCards(cards.yellow),
+                red: normCards(cards.red)
+            }
+        };
+    }
+
+    function normalizeScoreboardRow(r) {
+        return {
+            team_name: r.team_name ?? r.team ?? r.name ?? '',
+            won: Number(r.won ?? 0) || 0,
+            played: Number(r.played ?? 0) || 0,
+            drawn: Number(r.drawn ?? 0) || 0,
+            lost: Number(r.lost ?? 0) || 0,
+            in_game: r.in_game === true || r.in_game === 'true',
+            points: Number(r.points ?? 0) || 0
+        };
+    }
+
+    function yamlStr(val) {
+        if (val === '' || val === null || val === undefined) return '""';
+        if (typeof val === 'number' || typeof val === 'boolean') return String(val);
+        const s = String(val);
+        if (/^-?\d+(\.\d+)?$/.test(s)) return s;
+        if (s === '' || /[:#\[\]{}&*!|>'"%@`]/.test(s) || /^\s|\s$/.test(s) || s === 'true' || s === 'false' || s === 'null') {
+            return '"' + s.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
+        }
+        return s;
+    }
+
+    function serializeMatchList(key, list) {
+        if (!list.length) return `${key}: []\n`;
+        let out = `${key}:\n`;
+        for (const m of list) {
+            const s1 = m.team_1.score === '' || m.team_1.score === null || m.team_1.score === undefined
+                ? '""'
+                : (/^-?\d+$/.test(String(m.team_1.score).trim()) ? String(m.team_1.score).trim() : yamlStr(m.team_1.score));
+            const s2 = m.team_2.score === '' || m.team_2.score === null || m.team_2.score === undefined
+                ? '""'
+                : (/^-?\d+$/.test(String(m.team_2.score).trim()) ? String(m.team_2.score).trim() : yamlStr(m.team_2.score));
+
+            out += `  - team_1:\n`;
+            out += `      name: ${yamlStr(m.team_1.name)}\n`;
+            out += `      score: ${s1}\n`;
+            out += `    team_2:\n`;
+            out += `      name: ${yamlStr(m.team_2.name)}\n`;
+            out += `      score: ${s2}\n`;
+            out += `    cards:\n`;
+
+            const yellows = (m.cards.yellow || []).map(x => x.trim()).filter(Boolean);
+            const reds = (m.cards.red || []).map(x => x.trim()).filter(Boolean);
+
+            if (!yellows.length) {
+                out += `      yellow: []\n`;
+            } else {
+                out += `      yellow:\n`;
+                for (const p of yellows) out += `        - name: ${yamlStr(p)}\n`;
+            }
+
+            if (!reds.length) {
+                out += `      red: []\n`;
+            } else {
+                out += `      red:\n`;
+                for (const p of reds) out += `        - name: ${yamlStr(p)}\n`;
+            }
+        }
+        return out;
+    }
+
+    function generateYaml() {
+        let yaml = '';
+        yaml += serializeMatchList('live', state.live) + '\n';
+        yaml += serializeMatchList('previous', state.previous) + '\n';
+        yaml += serializeMatchList('next', state.next) + '\n';
+
+        if (!state.scoreboard.length) {
+            yaml += 'scoreboard: []\n';
+        } else {
+            yaml += 'scoreboard:\n';
+            for (const r of state.scoreboard) {
+                yaml += `  - team_name: ${yamlStr(r.team_name)}\n`;
+                yaml += `    won: ${Number(r.won) || 0}\n`;
+                yaml += `    played: ${Number(r.played) || 0}\n`;
+                yaml += `    drawn: ${Number(r.drawn) || 0}\n`;
+                yaml += `    lost: ${Number(r.lost) || 0}\n`;
+                yaml += `    in_game: ${Boolean(r.in_game)}\n`;
+                yaml += `    points: ${Number(r.points) || 0}\n`;
+            }
+        }
+        return yaml;
+    }
+
+    function esc(s) {
+        return String(s ?? '')
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function renderMatchSection(sectionKey, containerId, emptyLabel) {
+        const container = document.getElementById(containerId);
+        const list = state[sectionKey];
+        if (!list.length) {
+            container.innerHTML = `<div class="empty-state">${esc(emptyLabel)}</div>`;
+            return;
+        }
+
+        container.innerHTML = list.map((m, idx) => {
+            const isLive = sectionKey === 'live';
+            const tagText = isLive ? `🔴 Live #${idx + 1}` : sectionKey === 'previous' ? `Previous #${idx + 1}` : `Upcoming #${idx + 1}`;
+            const yellowHtml = m.cards.yellow.map((p, cIdx) => `
+                <div class="player-row">
+                    <input type="text" class="field-input" value="${esc(p)}" placeholder="Player name"
+                        data-sec="${sectionKey}" data-idx="${idx}" data-card="yellow" data-cidx="${cIdx}">
+                    <button type="button" class="btn-danger btn-sm" data-action="del-card"
+                        data-sec="${sectionKey}" data-idx="${idx}" data-card="yellow" data-cidx="${cIdx}">×</button>
+                </div>
+            `).join('');
+
+            const redHtml = m.cards.red.map((p, cIdx) => `
+                <div class="player-row">
+                    <input type="text" class="field-input" value="${esc(p)}" placeholder="Player name"
+                        data-sec="${sectionKey}" data-idx="${idx}" data-card="red" data-cidx="${cIdx}">
+                    <button type="button" class="btn-danger btn-sm" data-action="del-card"
+                        data-sec="${sectionKey}" data-idx="${idx}" data-card="red" data-cidx="${cIdx}">×</button>
+                </div>
+            `).join('');
+
+            return `
+                <div class="editor-card ${isLive ? 'live-card' : ''}">
+                    <div class="card-head">
+                        <span class="badge-tag ${isLive ? 'live' : ''}">${tagText}</span>
+                        <div style="display:flex; gap:0.4rem;">
+                            ${isLive ? `<button type="button" class="btn-ghost btn-sm" data-action="finish-live" data-idx="${idx}">Finish → Previous</button>` : ''}
+                            ${sectionKey === 'next' ? `<button type="button" class="btn-ghost btn-sm" data-action="start-next" data-idx="${idx}">Start Live</button>` : ''}
+                            <button type="button" class="btn-danger btn-sm" data-action="del-match" data-sec="${sectionKey}" data-idx="${idx}">Delete</button>
+                        </div>
+                    </div>
+                    <div class="teams-grid">
+                        <div class="team-box">
+                            <input type="text" class="field-input" value="${esc(m.team_1.name)}" placeholder="Team 1 Name"
+                                data-sec="${sectionKey}" data-idx="${idx}" data-field="t1-name">
+                            <input type="text" class="field-input score-input" value="${esc(m.team_1.score)}" placeholder="Score"
+                                data-sec="${sectionKey}" data-idx="${idx}" data-field="t1-score">
+                        </div>
+                        <div class="vs-pill">VS</div>
+                        <div class="team-box">
+                            <input type="text" class="field-input" value="${esc(m.team_2.name)}" placeholder="Team 2 Name"
+                                data-sec="${sectionKey}" data-idx="${idx}" data-field="t2-name">
+                            <input type="text" class="field-input score-input" value="${esc(m.team_2.score)}" placeholder="Score"
+                                data-sec="${sectionKey}" data-idx="${idx}" data-field="t2-score">
+                        </div>
+                    </div>
+                    <div class="cards-editor">
+                        <div class="card-group">
+                            <div class="card-group-head">
+                                <span>🟨 Yellow Cards</span>
+                                <button type="button" class="btn-ghost btn-sm" data-action="add-card"
+                                    data-sec="${sectionKey}" data-idx="${idx}" data-card="yellow">+ Add</button>
+                            </div>
+                            ${yellowHtml}
+                        </div>
+                        <div class="card-group">
+                            <div class="card-group-head">
+                                <span>🟥 Red Cards</span>
+                                <button type="button" class="btn-ghost btn-sm" data-action="add-card"
+                                    data-sec="${sectionKey}" data-idx="${idx}" data-card="red">+ Add</button>
+                            </div>
+                            ${redHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderScoreboard() {
+        const tbody = document.getElementById('scoreboard-body');
+        if (!state.scoreboard.length) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem;">No teams in scoreboard.</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = state.scoreboard.map((r, idx) => `
+            <tr>
+                <td style="text-align:left;">
+                    <input type="text" class="sb-name-input" value="${esc(r.team_name)}" placeholder="Team name" data-sb="${idx}" data-col="team_name">
+                </td>
+                <td><input type="number" class="sb-input" value="${esc(r.played)}" data-sb="${idx}" data-col="played"></td>
+                <td><input type="number" class="sb-input" value="${esc(r.won)}" data-sb="${idx}" data-col="won"></td>
+                <td><input type="number" class="sb-input" value="${esc(r.drawn)}" data-sb="${idx}" data-col="drawn"></td>
+                <td><input type="number" class="sb-input" value="${esc(r.lost)}" data-sb="${idx}" data-col="lost"></td>
+                <td>
+                    <button type="button" class="toggle-btn ${r.in_game ? 'on' : 'off'}" data-action="toggle-ingame" data-sb="${idx}">
+                        ${r.in_game ? 'Yes' : 'No'}
+                    </button>
+                </td>
+                <td><input type="number" class="sb-input" value="${esc(r.points)}" data-sb="${idx}" data-col="points"></td>
+                <td>
+                    <button type="button" class="btn-danger btn-sm" data-action="del-team" data-sb="${idx}">×</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderAll() {
+        renderMatchSection('live', 'live-container', 'No live match right now.');
+        renderMatchSection('previous', 'previous-container', 'No previous matches yet.');
+        renderMatchSection('next', 'next-container', 'No upcoming matches scheduled.');
+        renderScoreboard();
+    }
+
+    function showToast(msg, ok = true) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = `toast show ${ok ? 'ok' : 'err'}`;
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => { t.className = 'toast'; }, 3400);
+    }
+
+    async function loadScores() {
+        try {
+            const res = await fetch(`${SCORES_URL}?t=${Date.now()}`, { cache: 'no-store' });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const text = await res.text();
+            const parsed = parseYaml(text);
+
+            const toArr = (v) => Array.isArray(v) ? v : (v && typeof v === 'object' && Object.keys(v).length ? [v] : []);
+
+            state.live = toArr(parsed.live).map(normalizeMatch);
+            state.previous = toArr(parsed.previous).map(normalizeMatch);
+            state.next = toArr(parsed.next).map(normalizeMatch);
+            state.scoreboard = toArr(parsed.scoreboard).map(normalizeScoreboardRow);
+
+            renderAll();
+        } catch (err) {
+            showToast('Failed to load scores.yml', false);
+        }
+    }
+
+    function archiveCurrentLiveToPrevious() {
+        if (state.live.length > 0) {
+            const finished = state.live.splice(0, state.live.length);
+            state.previous = [...finished, ...state.previous];
+        }
+    }
+
+    document.getElementById('add-live-btn').addEventListener('click', () => {
+        archiveCurrentLiveToPrevious();
+        if (state.next.length > 0) {
+            const promoted = state.next.shift();
+            if (promoted.team_1.score === '') promoted.team_1.score = 0;
+            if (promoted.team_2.score === '') promoted.team_2.score = 0;
+            state.live.push(promoted);
+            showToast('Moved live to previous & promoted next match to live');
+        } else {
+            state.live.push(createEmptyMatch(false));
+            showToast('Moved current live to previous & created new live match');
+        }
+        renderAll();
+    });
+
+    document.getElementById('promote-next-btn').addEventListener('click', () => {
+        if (!state.next.length) {
+            showToast('No upcoming match to promote', false);
+            return;
+        }
+        archiveCurrentLiveToPrevious();
+        const promoted = state.next.shift();
+        if (promoted.team_1.score === '') promoted.team_1.score = 0;
+        if (promoted.team_2.score === '') promoted.team_2.score = 0;
+        state.live.push(promoted);
+        renderAll();
+        showToast('Promoted upcoming match to live');
+    });
+
+    document.getElementById('add-previous-btn').addEventListener('click', () => {
+        state.previous.unshift(createEmptyMatch(false));
+        renderAll();
+    });
+
+    document.getElementById('add-next-btn').addEventListener('click', () => {
+        state.next.push(createEmptyMatch(true));
+        renderAll();
+    });
+
+    document.getElementById('add-team-btn').addEventListener('click', () => {
+        state.scoreboard.push({
+            team_name: '',
+            won: 0,
+            played: 0,
+            drawn: 0,
+            lost: 0,
+            in_game: false,
+            points: 0
+        });
+        renderScoreboard();
+    });
+
+    document.addEventListener('input', (e) => {
+        const el = e.target;
+        if (el.dataset.sec !== undefined) {
+            const sec = el.dataset.sec;
+            const idx = Number(el.dataset.idx);
+            const m = state[sec][idx];
+            if (!m) return;
+
+            if (el.dataset.field === 't1-name') m.team_1.name = el.value;
+            else if (el.dataset.field === 't1-score') m.team_1.score = el.value;
+            else if (el.dataset.field === 't2-name') m.team_2.name = el.value;
+            else if (el.dataset.field === 't2-score') m.team_2.score = el.value;
+            else if (el.dataset.card) {
+                m.cards[el.dataset.card][Number(el.dataset.cidx)] = el.value;
+            }
+        } else if (el.dataset.sb !== undefined) {
+            const idx = Number(el.dataset.sb);
+            const col = el.dataset.col;
+            if (!state.scoreboard[idx]) return;
+            state.scoreboard[idx][col] = col === 'team_name' ? el.value : (el.value === '' ? 0 : Number(el.value));
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-action]');
+        if (!btn) return;
+        const action = btn.dataset.action;
+
+        if (action === 'del-match') {
+            state[btn.dataset.sec].splice(Number(btn.dataset.idx), 1);
+            renderAll();
+        } else if (action === 'add-card') {
+            state[btn.dataset.sec][Number(btn.dataset.idx)].cards[btn.dataset.card].push('');
+            renderAll();
+        } else if (action === 'del-card') {
+            state[btn.dataset.sec][Number(btn.dataset.idx)].cards[btn.dataset.card].splice(Number(btn.dataset.cidx), 1);
+            renderAll();
+        } else if (action === 'finish-live') {
+            const [finished] = state.live.splice(Number(btn.dataset.idx), 1);
+            if (finished) state.previous.unshift(finished);
+            renderAll();
+        } else if (action === 'start-next') {
+            archiveCurrentLiveToPrevious();
+            const [promoted] = state.next.splice(Number(btn.dataset.idx), 1);
+            if (promoted) {
+                if (promoted.team_1.score === '') promoted.team_1.score = 0;
+                if (promoted.team_2.score === '') promoted.team_2.score = 0;
+                state.live.push(promoted);
+            }
+            renderAll();
+        } else if (action === 'toggle-ingame') {
+            const row = state.scoreboard[Number(btn.dataset.sb)];
+            if (row) {
+                row.in_game = !row.in_game;
+                renderScoreboard();
+            }
+        } else if (action === 'del-team') {
+            state.scoreboard.splice(Number(btn.dataset.sb), 1);
+            renderScoreboard();
+        }
+    });
+
+    document.getElementById('reload-btn').addEventListener('click', () => {
+        loadScores();
+        showToast('Reloaded from remote scores.yml');
+    });
+
+    const modal = document.getElementById('password-modal');
+    const pwInput = document.getElementById('admin-password-input');
+
+    document.getElementById('apply-btn').addEventListener('click', () => {
+        pwInput.value = '';
+        modal.classList.add('open');
+        setTimeout(() => pwInput.focus(), 50);
+    });
+
+    document.getElementById('cancel-modal-btn').addEventListener('click', () => {
+        modal.classList.remove('open');
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('open');
+    });
+
+    async function submitChanges() {
+        const password = pwInput.value;
+        if (!password) {
+            showToast('Password is required', false);
+            return;
+        }
+        const submitBtn = document.getElementById('submit-modal-btn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Publishing…';
+
+        try {
+            const yamlContent = generateYaml();
+            const res = await fetch(ADMIN_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    password: password,
+                    file: yamlContent
+                })
+            });
+
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                throw new Error(data.detail || `Error ${res.status}`);
+            }
+
+            modal.classList.remove('open');
+            showToast('scores.yml updated & cache purged!');
+        } catch (err) {
+            showToast(err.message || 'Update failed', false);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Publish';
+        }
+    }
+
+    document.getElementById('submit-modal-btn').addEventListener('click', submitChanges);
+    pwInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submitChanges();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navMenu.classList.toggle('active');
+                document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+            });
+        }
+
+        const header = document.querySelector('.header');
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 100);
+        });
+
+        loadScores();
+    });
+    </script>
+</body>
+</html>
