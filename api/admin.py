@@ -11,7 +11,7 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 GITHUB_OWNER = "spadlor"
 GITHUB_REPO = "mpl"
 GITHUB_BRANCH = "main"
-GITHUB_FILE_PATH = "public/scores.yml"
+GITHUB_FILE_PATH = "scores.yml"
 JSDELIVR_PURGE_URL = "https://purge.jsdelivr.net/"
 
 logger = logging.getLogger("admin_scores")
