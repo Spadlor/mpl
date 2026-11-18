@@ -6,6 +6,9 @@
     <title>KAC · Admin</title>
     <link rel="stylesheet" href="./styles.css">
     <style>
+        body {
+            color: #000000 !important;
+        }
         .admin-bar {
             position: sticky;
             top: 0;
@@ -28,6 +31,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            color: #ffffff;
         }
         .admin-actions {
             display: flex;
@@ -62,12 +66,24 @@
             padding: 0.4rem 0.75rem;
             font-size: 0.82rem;
             border-radius: 8px;
+            background: #ffffff;
+            color: #000000;
         }
         .btn-danger {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
+            background: #ffffff;
+            color: #000000;
         }
-        .btn-danger:hover { background: rgba(239, 68, 68, 0.28); }
+        .btn-danger:hover { background: #fee2e2; }
+        
+        /* Apply Changes floating/spaced out bar */
+        .apply-container {
+            margin: 2rem auto 1rem auto;
+            max-width: 1200px;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+
         .section-top {
             display: flex;
             align-items: flex-end;
@@ -77,19 +93,24 @@
             flex-wrap: wrap;
         }
         .section-top .section-header { margin-bottom: 0; text-align: left; }
+        .section-top .section-header h2, .section-top .section-header p {
+            color: #000000;
+        }
         .section-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
         .editor-card {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.09);
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
             border-radius: 16px;
             padding: 1.25rem;
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            color: #000000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         .editor-card.live-card {
-            border-color: rgba(239, 68, 68, 0.45);
-            box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.15);
+            border-color: #ef4444;
+            box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
         }
         .card-head {
             display: flex;
@@ -105,9 +126,10 @@
             letter-spacing: 0.06em;
             padding: 0.25rem 0.6rem;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
+            background: #f1f5f9;
+            color: #000000;
         }
-        .badge-tag.live { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .badge-tag.live { background: rgba(239, 68, 68, 0.15); color: #b91c1c; }
         .teams-grid {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
@@ -126,23 +148,23 @@
         .vs-pill {
             font-weight: 800;
             font-size: 0.85rem;
-            opacity: 0.6;
+            color: #000000;
             padding: 0 0.25rem;
         }
         .field-input {
             width: 100%;
-            background: rgba(15, 23, 42, 0.65);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
             border-radius: 9px;
             padding: 0.55rem 0.75rem;
-            color: inherit;
+            color: #000000;
             font-size: 0.92rem;
             font-family: inherit;
             box-sizing: border-box;
         }
         .field-input:focus {
             outline: none;
-            border-color: #818cf8;
+            border-color: #6366f1;
         }
         .score-input {
             font-weight: 700;
@@ -154,7 +176,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 0.75rem;
             padding-top: 0.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            border-top: 1px solid #e2e8f0;
         }
         @media (max-width: 600px) {
             .cards-editor { grid-template-columns: 1fr; }
@@ -170,7 +192,7 @@
             justify-content: space-between;
             font-size: 0.8rem;
             font-weight: 600;
-            opacity: 0.85;
+            color: #000000;
         }
         .player-row {
             display: flex;
@@ -185,10 +207,10 @@
             width: 72px;
             text-align: center;
             padding: 0.4rem 0.45rem;
-            background: rgba(15, 23, 42, 0.65);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
-            color: inherit;
+            color: #000000;
             font-family: inherit;
             font-size: 0.9rem;
         }
@@ -196,23 +218,23 @@
             width: 100%;
             min-width: 140px;
             padding: 0.4rem 0.6rem;
-            background: rgba(15, 23, 42, 0.65);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
-            color: inherit;
+            color: #000000;
             font-family: inherit;
             font-size: 0.9rem;
         }
         .toggle-btn {
             padding: 0.35rem 0.7rem;
             border-radius: 999px;
-            border: none;
+            border: 1px solid #cbd5e1;
             font-weight: 700;
             font-size: 0.8rem;
             cursor: pointer;
         }
-        .toggle-btn.on { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
-        .toggle-btn.off { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+        .toggle-btn.on { background: #dcfce7; color: #166534; }
+        .toggle-btn.off { background: #f1f5f9; color: #475569; }
         .modal-backdrop {
             position: fixed;
             inset: 0;
@@ -226,8 +248,8 @@
         }
         .modal-backdrop.open { display: flex; }
         .modal-box {
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
             border-radius: 18px;
             padding: 1.5rem;
             width: 100%;
@@ -235,10 +257,11 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+            color: #000000;
         }
-        .modal-box h3 { margin: 0; font-size: 1.2rem; }
-        .modal-box p { margin: 0; font-size: 0.9rem; opacity: 0.75; }
+        .modal-box h3 { margin: 0; font-size: 1.2rem; color: #000000; }
+        .modal-box p { margin: 0; font-size: 0.9rem; color: #334155; }
         .modal-footer { display: flex; justify-content: flex-end; gap: 0.6rem; }
         .toast {
             position: fixed;
@@ -256,6 +279,20 @@
         .toast.show { transform: translateY(0); opacity: 1; }
         .toast.ok { background: #16a34a; color: #fff; }
         .toast.err { background: #dc2626; color: #fff; }
+        
+        /* Global page text overrides inside sections */
+        .score-section h2, .score-section p, .score-section span, .score-section th, .score-section td {
+            color: #000000 !important;
+        }
+        .table-wrap {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+        }
+        table.scoreboard th, table.scoreboard td {
+            color: #000000 !important;
+            border-bottom: 1px solid #e2e8f0;
+        }
     </style>
 </head>
 <body>
@@ -284,13 +321,11 @@
         </div>
     </header>
 
-    <div class="admin-bar">
-        <div class="container admin-bar-inner">
-            <div class="admin-title">⚙️ Scoreboard & Match Editor</div>
-            <div class="admin-actions">
-                <button type="button" class="btn-ghost" id="reload-btn">↻ Reload</button>
-                <button type="button" class="btn-primary" id="apply-btn">Apply Changes</button>
-            </div>
+    <!-- Apply changes positioned below the header -->
+    <div class="apply-container">
+        <div class="admin-actions">
+            <button type="button" class="btn-ghost" id="reload-btn" style="background:#ffffff; color:#000000; border:1px solid #cbd5e1;">↻ Reload</button>
+            <button type="button" class="btn-primary" id="apply-btn" style="background:#000000; color:#ffffff;">Apply Changes</button>
         </div>
     </div>
 
@@ -305,7 +340,7 @@
                     </div>
                     <div class="section-btns">
                         <button type="button" class="btn-ghost btn-sm" id="promote-next-btn">⬆ Promote First Upcoming to Live</button>
-                        <button type="button" class="btn-primary btn-sm" id="add-live-btn">+ Add New Live</button>
+                        <button type="button" class="btn-primary btn-sm" id="add-live-btn" style="background:#000000; color:#ffffff;">+ Add New Live</button>
                     </div>
                 </div>
                 <div id="live-container" class="score-grid">
@@ -385,8 +420,8 @@
             <p>Enter the admin password to publish changes to scores.yml.</p>
             <input type="password" id="admin-password-input" class="field-input" placeholder="Admin password" autocomplete="current-password">
             <div class="modal-footer">
-                <button type="button" class="btn-ghost" id="cancel-modal-btn">Cancel</button>
-                <button type="button" class="btn-primary" id="submit-modal-btn">Publish</button>
+                <button type="button" class="btn-ghost" id="cancel-modal-btn" style="border:1px solid #cbd5e1;">Cancel</button>
+                <button type="button" class="btn-primary" id="submit-modal-btn" style="background:#000000; color:#ffffff;">Publish</button>
             </div>
         </div>
     </div>
@@ -623,7 +658,7 @@
         const container = document.getElementById(containerId);
         const list = state[sectionKey];
         if (!list.length) {
-            container.innerHTML = `<div class="empty-state">${esc(emptyLabel)}</div>`;
+            container.innerHTML = `<div class="empty-state" style="color:#000000;">${esc(emptyLabel)}</div>`;
             return;
         }
 
@@ -699,7 +734,7 @@
     function renderScoreboard() {
         const tbody = document.getElementById('scoreboard-body');
         if (!state.scoreboard.length) {
-            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem;">No teams in scoreboard.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:#000000;">No teams in scoreboard.</td></tr>`;
             return;
         }
         tbody.innerHTML = state.scoreboard.map((r, idx) => `
@@ -928,7 +963,7 @@
                 throw new Error(data.detail || `Error ${res.status}`);
             }
 
-      modal.classList.remove('open');
+            modal.classList.remove('open');
             showToast('scores.yml updated & cache purged!');
         } catch (err) {
             showToast(err.message || 'Update failed', false);
