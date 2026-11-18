@@ -8,7 +8,7 @@
 
   "git": {
     "deploymentEnabled": {
-      "main": false ,
+      "main": true ,
       "fix/docs": true ,
       "dev": true 
     }
