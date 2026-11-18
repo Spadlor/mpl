@@ -15,7 +15,7 @@ def create_app() -> FastAPI:
         openapi_url=None,
     )
 
-    app.include_router(admin)
+    app.include_router(admin, prefix="/api")
     public_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")
     if os.path.isdir(public_dir):
         app.mount("/", StaticFiles(directory=public_dir, html=True), name="public")
